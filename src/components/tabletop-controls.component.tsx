@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TabletopGrid } from '../services';
 
 export interface TabletopControlsProperties {
@@ -6,6 +7,7 @@ export interface TabletopControlsProperties {
 }
 
 export function TabletopControls({ grid }: TabletopControlsProperties) {
+  const { t } = useTranslation();
   useEffect(() => {
     const keyboardListener = (event: KeyboardEvent) => {
       switch (event.key) {
@@ -34,10 +36,10 @@ export function TabletopControls({ grid }: TabletopControlsProperties) {
   }, [grid]);
   return (
     <>
-      <button onClick={() => grid.move('up')}>Up</button>
-      <button onClick={() => grid.move('down')}>Down</button>
-      <button onClick={() => grid.move('left')}>Left</button>
-      <button onClick={() => grid.move('right')}>Right</button>
+      <button onClick={() => grid.move('up')}>{t('dir-up')}</button>
+      <button onClick={() => grid.move('down')}>{t('dir-down')}</button>
+      <button onClick={() => grid.move('left')}>{t('dir-left')}</button>
+      <button onClick={() => grid.move('right')}>{t('dir-right')}</button>
     </>
   );
 }

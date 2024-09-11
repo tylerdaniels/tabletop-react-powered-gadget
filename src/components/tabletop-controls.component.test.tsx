@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { TabletopControls } from './tabletop-controls.component';
 import { TabletopGrid } from '../services';
 
-const BUTTON_EVENTS: string[][] = [
-  ['Up', 'up'],
-  ['Down', 'down'],
-  ['Left', 'left'],
-  ['Right', 'right'],
+const BUTTON_EVENTS: [RegExp, string][] = [
+  [/up/i, 'up'],
+  [/down/i, 'down'],
+  [/left/i, 'left'],
+  [/right/i, 'right'],
 ];
 
 const KEYBOARD_EVENTS: string[][] = [
@@ -30,7 +30,7 @@ describe('Tabletop Controls', () => {
     expect(buttons, 'controls should render 4 buttons').toHaveLength(4);
   });
   BUTTON_EVENTS.forEach((event) => {
-    it(`should move "${event[1]}" when "${event[0]}" is clicked`, async () => {
+    it(`should move "${event[1]}" when "${event[1]}" button is clicked`, async () => {
       const user = userEvent.setup();
       let movedDirection: string | undefined = undefined;
       const grid: Pick<TabletopGrid, 'move'> = {
