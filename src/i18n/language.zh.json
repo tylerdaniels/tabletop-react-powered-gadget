@@ -1,0 +1,14 @@
+{
+  "title": "玩具机器人模拟器",
+
+  "dir-up": "向上",
+  "dir-down": "向下",
+  "dir-left": "向左",
+  "dir-right": "向右",
+
+  "theme-select-light": "切换到亮色主题",
+  "theme-select-dark": "切换到深色主题",
+
+  "lang-select-en": "切换到英文",
+  "lang-select-zh": "切换到中文(简体)"
+}

@@ -1,8 +1,14 @@
 {
-  "title": "Vite + React",
+  "title": "Toy Robot Simulator",
 
   "dir-up": "Up",
   "dir-down": "Down",
   "dir-left": "Left",
-  "dir-right": "Right"
+  "dir-right": "Right",
+
+  "theme-select-light": "Switch to Light Theme",
+  "theme-select-dark": "Switch to Dark Theme",
+
+  "lang-select-en": "Switch to English",
+  "lang-select-zh": "Switch to Chinese (Simplified)"
 }

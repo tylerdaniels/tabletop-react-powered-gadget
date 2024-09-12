@@ -1,0 +1,28 @@
+@import './styles/variables';
+
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  // Background image for tiny screens
+  position: absolute;
+  left: 20px;
+  top: 80px;
+  max-width: 200px;
+  float: left;
+  opacity: 20%;
+
+  @include md {
+    // Show normally with more screen space
+    position: unset;
+    left: unset;
+    top: unset;
+    max-width: unset;
+    float: unset;
+    opacity: unset;
+  }
+}
