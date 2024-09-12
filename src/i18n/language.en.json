@@ -15,5 +15,9 @@
   "lang-select-en": "Switch to English",
   "lang-select-zh": "Switch to Chinese (Simplified)",
 
-  "status": "Status:"
+  "status": "Status:",
+  "status-ready": "Robot ready for commands",
+  "status-movement-invalid": "Invalid coordinates for setting position",
+  "status-movement-cancelled": "Oh no! Don't make me fall off the table!",
+  "status-movement-update": "Robot moved to position X: {{x}}, Y: {{y}}"
 }

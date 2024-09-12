@@ -1,0 +1,35 @@
+.label {
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+.type-position span {
+  color: #333;
+
+  :global(body.dark) & {
+    color: #aaa;
+  }
+}
+
+.type-info span {
+  color: #333;
+  font-weight: 600;
+
+  :global(body.dark) & {
+    color: #aaa;
+  }
+}
+
+.type-warn span {
+  color: #993;
+  font-weight: 600;
+}
+
+.type-error span {
+  color: #933;
+  font-weight: 600;
+
+  :global(body.dark) & {
+    color: #c33;
+  }
+}

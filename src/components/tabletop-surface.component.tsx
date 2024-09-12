@@ -1,6 +1,6 @@
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { GridPosition, TabletopGrid } from '../services';
-import { Subscription } from 'rxjs';
+import { Direction, GridPosition, TabletopGrid } from '../services';
+import { filter, Subscription } from 'rxjs';
 
 import styles from './tabletop-surface.module.scss';
 
@@ -14,13 +14,17 @@ export interface TabletopSurfaceProperties {
 
 export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
   const subscription = useRef(Subscription.EMPTY);
+  const [direction, setDirection] = useState<Direction>('up');
   const [position, setPosition] = useState(grid.robotPosition);
   const [gridStyles, setGridStyles] = useState({} as CSSProperties);
   const [rows, setRows] = useState([] as React.JSX.Element[]);
   // Update "position" and "styles" state objects when the grid changes
   useEffect(() => {
-    const sub = grid.onMove.subscribe((event) => {
+    const sub = grid.onStatus.pipe(filter((e) => e.type === 'position')).subscribe((event) => {
       setPosition(event.to);
+      if (event.direction) {
+        setDirection(event.direction);
+      }
     });
     subscription.current = sub;
     const styles = {} as CSSProperties;
@@ -33,11 +37,17 @@ export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
   }, [grid]);
   // Rerender the rows when the position changes
   useEffect(() => {
+    function calculateStyles(isCurrent: boolean) {
+      if (!isCurrent) {
+        return styles.gridItem;
+      }
+      return [styles.gridItem, styles.current, styles['dir-' + direction]].join(' ');
+    }
     const newRows: React.JSX.Element[] = [];
     for (let y = 0; y < grid.height; y++) {
       for (let x = 0; x < grid.width; x++) {
         const key = x.toString() + ',' + y.toString();
-        const gridStyles = isCurrentPosition(position, x, y) ? styles.gridItem + ' ' + styles.current : styles.gridItem;
+        const gridStyles = calculateStyles(isCurrentPosition(position, x, y));
         newRows.push(
           <div key={key} className={gridStyles}>
             &nbsp;

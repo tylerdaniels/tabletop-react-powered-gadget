@@ -31,8 +31,38 @@
   }
 }
 
+@keyframes move-vert {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0%); }
+}
+
+@keyframes move-hori {
+  from { transform: translate(0, 100%); }
+  to   { transform: translate(0, 0%); }
+}
+
 .gridItem {
   &.current {
-    background-color: #F00;
+    background: url('../assets/robot-sprite.png') center no-repeat;
+    background-size: contain;
+
+    animation-timing-function: linear;
+
+    &.dir-up {
+      rotate: 0;
+      animation: move-vert 0.2s backwards;
+    }
+    &.dir-right {
+      rotate: 90deg;
+      animation: move-hori 0.2s forwards;
+    }
+    &.dir-left {
+      rotate: -90deg;
+      animation: move-hori 0.2s backwards;
+    }
+    &.dir-down {
+      rotate: 180deg;
+      animation: move-vert 0.2s forwards;
+    }
   }
 }

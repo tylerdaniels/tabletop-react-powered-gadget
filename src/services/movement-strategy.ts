@@ -1,5 +1,5 @@
 import { TabletopGrid } from './tabletop-grid';
-import type { MoveEvent } from './tabletop.types';
+import type { MoveRequest } from './tabletop.types';
 import { isWithinGrid } from './tabletop.utils';
 
 /**
@@ -7,7 +7,7 @@ import { isWithinGrid } from './tabletop.utils';
  * of walking into walls (or any other movement).
  */
 export interface MovementStrategy {
-  move(event: MoveEvent, grid: TabletopGrid): MoveEvent | undefined;
+  move(event: MoveRequest, grid: TabletopGrid): MoveRequest | undefined;
 }
 
 /**
@@ -15,7 +15,7 @@ export interface MovementStrategy {
  * creating a toroidal world space.
  */
 export class PacmanWalls implements MovementStrategy {
-  move(event: MoveEvent, grid: TabletopGrid): MoveEvent {
+  move(event: MoveRequest, grid: TabletopGrid): MoveRequest {
     if (isWithinGrid(event.to, grid.width, grid.height)) {
       // Move as normal
       return event;
@@ -34,6 +34,7 @@ export class PacmanWalls implements MovementStrategy {
     return {
       from: event.from,
       to: { x, y },
+      direction: event.direction,
     };
   }
 }
@@ -43,7 +44,7 @@ export class PacmanWalls implements MovementStrategy {
  * the robot to leave the valid dimensions of the grid.
  */
 export class BlockingWalls implements MovementStrategy {
-  move(event: MoveEvent, grid: TabletopGrid): MoveEvent | undefined {
+  move(event: MoveRequest, grid: TabletopGrid): MoveRequest | undefined {
     if (isWithinGrid(event.to, grid.width, grid.height)) {
       return event;
     }

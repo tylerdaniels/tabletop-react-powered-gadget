@@ -7,18 +7,34 @@ export interface GridPosition {
   readonly y: number;
 }
 
-/**
- * Movement event indicating the origin and destination
- */
-export interface MoveEvent {
+export interface MoveRequest {
   to: GridPosition;
   from: GridPosition;
+  direction?: Direction;
 }
 
 /**
  * Status event indicating a change has occurred
  */
-export interface StatusEvent {
-  type: 'position' | 'info' | 'warn' | 'error';
+export type StatusEvent = LoggingEvent | MoveEvent;
+
+/**
+ * Logging event describing what change has occurred
+ */
+export interface LoggingEvent {
+  type: 'info' | 'warn' | 'error';
   message: string;
+  translationKey?: string;
+}
+
+export type Direction = 'up' | 'down' | 'left' | 'right';
+
+/**
+ * Movement event indicating the origin and destination, and possibly the direction
+ */
+export interface MoveEvent {
+  type: 'position';
+  to: GridPosition;
+  from: GridPosition;
+  direction?: Direction;
 }

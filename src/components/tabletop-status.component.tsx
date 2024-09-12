@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { StatusEvent, TabletopGrid } from '../services';
+import { LoggingEvent, MoveEvent, StatusEvent, TabletopGrid } from '../services';
 import { Subscription } from 'rxjs';
 import { useTranslation } from 'react-i18next';
+
+import styles from './tabletop-status.module.scss';
 
 export interface TabletopStatusProperties {
   grid: TabletopGrid;
@@ -30,11 +32,12 @@ function timeoutForEventType(
 }
 
 export function TabletopStatus({ grid, infoTimeout, warnTimeout, errorTimeout }: TabletopStatusProperties) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const subscription = useRef(Subscription.EMPTY);
-  const [positionStatus, setPositionStatus] = useState<StatusEvent | undefined>();
-  const [otherStatus, setOtherStatus] = useState<StatusEvent | undefined>();
-  const [displayStatus, setDisplayStatus] = useState<StatusEvent | undefined>(otherStatus ?? positionStatus);
+  const [positionStatus, setPositionStatus] = useState<MoveEvent | undefined>();
+  const [otherStatus, setOtherStatus] = useState<LoggingEvent | undefined>();
+  const [displayStyle, setDisplayStyle] = useState('');
+  const [displayStatus, setDisplayStatus] = useState('');
   // Update "status" state objects from observable
   useEffect(() => {
     const sub = grid.onStatus.subscribe((event) => {
@@ -68,13 +71,23 @@ export function TabletopStatus({ grid, infoTimeout, warnTimeout, errorTimeout }:
   }, [otherStatus, infoTimeout, warnTimeout, errorTimeout]);
   // Update "display status" state objects from other values
   useEffect(() => {
-    setDisplayStatus(otherStatus ?? positionStatus);
-  }, [positionStatus, otherStatus]);
+    if (otherStatus) {
+      setDisplayStyle(styles['type-' + otherStatus.type]);
+      setDisplayStatus(otherStatus.translationKey ? t(otherStatus.translationKey) : otherStatus.message);
+    } else if (positionStatus) {
+      setDisplayStyle(styles['type-position']);
+      const message = t('status-movement-update', { x: positionStatus.to.x, y: positionStatus.to.y });
+      setDisplayStatus(message);
+    } else {
+      setDisplayStyle('');
+      setDisplayStatus('');
+    }
+  }, [i18n.language, positionStatus, otherStatus]);
   return (
     <>
-      <div>
-        <strong>{t('status')}</strong>
-        <span>{displayStatus?.message}</span>
+      <div className={displayStyle}>
+        <strong className={styles.label}>{t('status')}</strong>
+        <span>{displayStatus}</span>
       </div>
     </>
   );

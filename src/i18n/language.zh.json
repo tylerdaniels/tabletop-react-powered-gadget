@@ -5,8 +5,6 @@
   "dir-down": "向下",
   "dir-left": "向左",
   "dir-right": "向右",
-  "coord-x": "X坐标:",
-  "coord-y": "Y坐标:",
   "coord-set": "设置位置",
 
   "theme-select-light": "切换到亮色主题",
@@ -15,5 +13,9 @@
   "lang-select-en": "切换到英文",
   "lang-select-zh": "切换到中文(简体)",
 
-  "status": "状态:"
+  "status": "状态:",
+  "status-ready": "机器人准备好接受指令",
+  "status-movement-invalid": "无效坐标，无法设置位置",
+  "status-movement-cancelled": "糟糕！别让我掉下桌子！",
+  "status-movement-update": "机器人已移动至 X: {{x}}, Y: {{y}}"
 }

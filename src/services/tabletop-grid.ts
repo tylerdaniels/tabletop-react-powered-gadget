@@ -1,7 +1,7 @@
-import { Observable, ReplaySubject } from 'rxjs';
+import { filter, Observable, ReplaySubject } from 'rxjs';
 import { BlockingWalls, MovementStrategy } from './movement-strategy';
 import { isPositiveInteger, isWithinGrid } from './tabletop.utils';
-import type { GridPosition, MoveEvent, StatusEvent } from './tabletop.types';
+import type { Direction, GridPosition, MoveEvent, StatusEvent } from './tabletop.types';
 
 export interface TabletopGridOptions {
   width: number;
@@ -9,8 +9,6 @@ export interface TabletopGridOptions {
   initialPosition: GridPosition;
   movementStrategy: MovementStrategy;
 }
-
-export type Direction = 'up' | 'down' | 'left' | 'right';
 
 function sanitiseOptions(opts?: Partial<Readonly<TabletopGridOptions>>): TabletopGridOptions {
   let { width, height, initialPosition, movementStrategy } = opts ?? {};
@@ -46,19 +44,11 @@ export class TabletopGrid {
     return this._robotPosition;
   }
 
-  private readonly moveSubject = new ReplaySubject<MoveEvent>();
-  /**
-   * Subscribe for movement events, events emitted have already
-   * been sanitised by the Movement Strategy and will be the
-   * accepted state of the robot's position
-   */
-  public readonly onMove: Observable<MoveEvent> = this.moveSubject.asObservable();
-
   private readonly statusSubject = new ReplaySubject<StatusEvent>();
   /**
-   * Subscribe for movement events, events emitted are an indication
+   * Subscribe for position events or logging events; those emitted are an indication
    * of what is happening internally with the class, this might be
-   * a movement update ('position': in text form) or a reaction from the robot itself
+   * a movement update ('position') or a reaction from the robot itself
    */
   public readonly onStatus: Observable<StatusEvent> = this.statusSubject.asObservable();
 
@@ -69,10 +59,11 @@ export class TabletopGrid {
     this._robotPosition = initialPosition;
     this.movementStrategy = movementStrategy;
     // Subscribe to the public listener for simplicity
-    this.onMove.subscribe((event) => (this._robotPosition = event.to));
+    this.onStatus.pipe(filter((e) => e.type === 'position')).subscribe((event) => (this._robotPosition = event.to));
     this.statusSubject.next({
       type: 'info',
       message: 'Robot ready!',
+      translationKey: 'status-ready',
     });
   }
 
@@ -93,20 +84,23 @@ export class TabletopGrid {
         break;
     }
     const newPosition = { x, y };
-    const event = this.movementStrategy.move({ to: newPosition, from: this.robotPosition }, this);
-    if (event) {
-      this.moveSubject.next(event);
-      this.statusSubject.next({
+    const moveRequest = this.movementStrategy.move({ to: newPosition, from: this.robotPosition }, this);
+    if (moveRequest) {
+      const event: MoveEvent = {
         type: 'position',
-        message: `Moved to coordinates: (${event.to.x.toString()}, ${event.to.y.toString()}); direction: ${direction}`,
-      });
+        from: moveRequest.from,
+        to: moveRequest.to,
+        direction,
+      };
+      this.statusSubject.next(event);
     } else {
       this.statusSubject.next({
         type: 'warn',
         message: 'Movement cancelled',
+        translationKey: 'status-movement-cancelled',
       });
     }
-    return event?.to ?? this.robotPosition;
+    return moveRequest?.to ?? this.robotPosition;
   }
 
   setPosition(x: number, y: number): boolean;
@@ -122,21 +116,24 @@ export class TabletopGrid {
       this.statusSubject.next({
         type: 'error',
         message: 'Invalid coordinates received for position',
+        translationKey: 'status-movement-invalid',
       });
       return false;
     }
-    const event = this.movementStrategy.move({ to: newPositionOrX, from: newPositionOrX }, this);
-    if (event) {
-      this.moveSubject.next(event);
-      this.statusSubject.next({
+    const moveRequest = this.movementStrategy.move({ to: newPositionOrX, from: newPositionOrX }, this);
+    if (moveRequest) {
+      const event: MoveEvent = {
         type: 'position',
-        message: `Moved to coordinates: (${event.to.x.toString()}, ${event.to.y.toString()})`,
-      });
+        from: moveRequest.from,
+        to: moveRequest.to,
+      };
+      this.statusSubject.next(event);
       return true;
     } else {
       this.statusSubject.next({
         type: 'warn',
         message: 'Explicit movement cancelled',
+        translationKey: 'status-movement-cancelled',
       });
       return false;
     }
