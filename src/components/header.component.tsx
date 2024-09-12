@@ -18,6 +18,7 @@ export function Header({ onThemeUpdate }: HeaderProps) {
   };
   const { t, i18n } = useTranslation();
   const otherLang: string = i18n.language === 'en' ? 'zh' : 'en';
+  const otherLangFlag: string = i18n.language === 'en' ? cnFlag : usFlag;
   const updateLang = () => {
     i18n.changeLanguage(otherLang).catch((e: unknown) => {
       console.log('Unable to update language', e);
@@ -26,7 +27,7 @@ export function Header({ onThemeUpdate }: HeaderProps) {
   return (
     <div className={styles.header}>
       <button className={styles['lang-selector']} onClick={updateLang}>
-        <img src={i18n.language === 'en' ? cnFlag : usFlag} alt={t('lang-select-' + otherLang)} />
+        <img src={otherLangFlag} alt={t('lang-select-' + otherLang)} />
       </button>
       <button className={styles['theme-selector']} onClick={updateTheme}>
         <i className="fa-solid fa-lightbulb" aria-label={t('theme-select-' + otherTheme)}></i>

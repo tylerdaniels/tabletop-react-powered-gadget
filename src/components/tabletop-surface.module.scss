@@ -32,13 +32,21 @@
 }
 
 @keyframes move-vert {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0%); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
 }
 
 @keyframes move-hori {
-  from { transform: translate(0, 100%); }
-  to   { transform: translate(0, 0%); }
+  from {
+    transform: translate(0, 100%);
+  }
+  to {
+    transform: translate(0, 0%);
+  }
 }
 
 .gridItem {

@@ -13,7 +13,8 @@
   "lang-select-en": "切换到英文",
   "lang-select-zh": "切换到中文(简体)",
 
-  "status": "状态:",
+  "status": "状态",
+  "status-not-ready": "请把我放到桌面上",
   "status-ready": "机器人准备好接受指令",
   "status-movement-invalid": "无效坐标，无法设置位置",
   "status-movement-cancelled": "糟糕！别让我掉下桌子！",

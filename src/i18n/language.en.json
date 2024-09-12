@@ -15,7 +15,8 @@
   "lang-select-en": "Switch to English",
   "lang-select-zh": "Switch to Chinese (Simplified)",
 
-  "status": "Status:",
+  "status": "Status",
+  "status-not-ready": "Place me on the table",
   "status-ready": "Robot ready for commands",
   "status-movement-invalid": "Invalid coordinates for setting position",
   "status-movement-cancelled": "Oh no! Don't make me fall off the table!",

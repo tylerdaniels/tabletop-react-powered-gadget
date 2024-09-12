@@ -6,18 +6,14 @@ describe('TabletopGrid', () => {
     expect(grid, 'No TabletopGrid created').toBeDefined();
     expect(grid.width, 'grid width undefined').toBeDefined();
     expect(grid.height, 'grid height undefined').toBeDefined();
-    expect(grid.robotPosition, 'grid position undefined').toBeDefined();
-    expect(grid.robotPosition.x, 'grid position.x undefined').toBeDefined();
-    expect(grid.robotPosition.y, 'grid position.y undefined').toBeDefined();
+    expect(grid.robotPosition, 'grid position was defined').toBeUndefined();
   });
   it('should create a grid with empty options', () => {
     const grid = new TabletopGrid({});
     expect(grid, 'No TabletopGrid created').toBeDefined();
     expect(grid.width, 'grid width undefined').toBeDefined();
     expect(grid.height, 'grid height undefined').toBeDefined();
-    expect(grid.robotPosition, 'grid position undefined').toBeDefined();
-    expect(grid.robotPosition.x, 'grid position.x undefined').toBeDefined();
-    expect(grid.robotPosition.y, 'grid position.y undefined').toBeDefined();
+    expect(grid.robotPosition, 'grid position was defined').toBeUndefined();
   });
   it('should create a grid with partial options', () => {
     const expectedWidth = 13;
@@ -26,9 +22,7 @@ describe('TabletopGrid', () => {
     expect(grid, 'No TabletopGrid created').toBeDefined();
     expect(grid.width, 'grid width incorrect').toBe(expectedWidth);
     expect(grid.height, 'grid height incorrect').toBe(expectedHeight);
-    expect(grid.robotPosition, 'grid position undefined').toBeDefined();
-    expect(grid.robotPosition.x, 'grid position.x undefined').toBeDefined();
-    expect(grid.robotPosition.y, 'grid position.y undefined').toBeDefined();
+    expect(grid.robotPosition, 'grid position was defined').toBeUndefined();
   });
   it('should throw with invalid width', () => {
     expect(() => new TabletopGrid({ width: -1 })).toThrowError();

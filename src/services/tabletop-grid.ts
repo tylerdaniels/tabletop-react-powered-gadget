@@ -6,21 +6,21 @@ import type { Direction, GridPosition, MoveEvent, StatusEvent } from './tabletop
 export interface TabletopGridOptions {
   width: number;
   height: number;
-  initialPosition: GridPosition;
+  initialPosition?: GridPosition;
   movementStrategy: MovementStrategy;
 }
 
 function sanitiseOptions(opts?: Partial<Readonly<TabletopGridOptions>>): TabletopGridOptions {
-  let { width, height, initialPosition, movementStrategy } = opts ?? {};
+  const { initialPosition } = opts ?? {};
+  let { width, height, movementStrategy } = opts ?? {};
   // Sane defaults for demonstration purposes
   width ??= 5;
   height ??= 5;
-  initialPosition ??= { x: 0, y: 0 };
   movementStrategy ??= new BlockingWalls();
   if (!isPositiveInteger(width) || !isPositiveInteger(height)) {
     throw new Error(`Invalid Grid Dimensions (${width.toString()}x${height.toString()}); please use positive integers`);
   }
-  if (!isWithinGrid(initialPosition, width, height)) {
+  if (initialPosition && !isWithinGrid(initialPosition, width, height)) {
     throw new Error(
       `Invalid Initial Position: (X: ${initialPosition.x.toString()}, Y: ${initialPosition.y.toString()}) ` +
         `is not within a ${width.toString()}x${height.toString()} grid; please use a valid position`
@@ -39,8 +39,8 @@ export class TabletopGrid {
   public readonly height: number;
   private readonly movementStrategy: MovementStrategy;
 
-  private _robotPosition: GridPosition;
-  public get robotPosition(): GridPosition {
+  private _robotPosition: GridPosition | undefined;
+  public get robotPosition(): GridPosition | undefined {
     return this._robotPosition;
   }
 
@@ -56,18 +56,32 @@ export class TabletopGrid {
     const { width, height, initialPosition, movementStrategy } = sanitiseOptions(opts);
     this.width = width;
     this.height = height;
-    this._robotPosition = initialPosition;
     this.movementStrategy = movementStrategy;
     // Subscribe to the public listener for simplicity
-    this.onStatus.pipe(filter((e) => e.type === 'position')).subscribe((event) => (this._robotPosition = event.to));
-    this.statusSubject.next({
-      type: 'info',
-      message: 'Robot ready!',
-      translationKey: 'status-ready',
+    this.onStatus.pipe(filter((e) => e.type === 'position')).subscribe((event) => {
+      if (!this.robotPosition) {
+        this.statusSubject.next({
+          type: 'info',
+          message: 'Robot ready!',
+          translationKey: 'status-ready',
+        });
+      }
+      this._robotPosition = event.to;
     });
+    if (initialPosition) {
+      this.setPosition(initialPosition);
+    }
   }
 
-  move(direction: Direction): GridPosition {
+  move(direction: Direction): GridPosition | undefined {
+    if (!this.robotPosition) {
+      this.statusSubject.next({
+        type: 'error',
+        message: 'No Robot!',
+        translationKey: 'status-not-ready',
+      });
+      return;
+    }
     let { x, y } = this.robotPosition;
     switch (direction) {
       case 'up':

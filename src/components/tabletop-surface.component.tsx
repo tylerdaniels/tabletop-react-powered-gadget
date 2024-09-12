@@ -1,10 +1,13 @@
-import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { Direction, GridPosition, TabletopGrid } from '../services';
-import { filter, Subscription } from 'rxjs';
+import { filter } from 'rxjs';
 
 import styles from './tabletop-surface.module.scss';
 
-function isCurrentPosition(pos: GridPosition, x: number, y: number): boolean {
+function isCurrentPosition(pos: GridPosition | undefined, x: number, y: number): boolean {
+  if (!pos) {
+    return false;
+  }
   return pos.x === x && pos.y === y;
 }
 
@@ -13,8 +16,7 @@ export interface TabletopSurfaceProperties {
 }
 
 export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
-  const subscription = useRef(Subscription.EMPTY);
-  const [direction, setDirection] = useState<Direction>('up');
+  const [direction, setDirection] = useState<Direction | undefined>(undefined);
   const [position, setPosition] = useState(grid.robotPosition);
   const [gridStyles, setGridStyles] = useState({} as CSSProperties);
   const [rows, setRows] = useState([] as React.JSX.Element[]);
@@ -22,11 +24,8 @@ export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
   useEffect(() => {
     const sub = grid.onStatus.pipe(filter((e) => e.type === 'position')).subscribe((event) => {
       setPosition(event.to);
-      if (event.direction) {
-        setDirection(event.direction);
-      }
+      setDirection(event.direction);
     });
-    subscription.current = sub;
     const styles = {} as CSSProperties;
     styles.gridTemplateColumns = `repeat(${grid.width.toString()}, 1fr)`;
     styles.gridTemplateRows = `repeat(${grid.height.toString()}, 1fr)`;
@@ -41,7 +40,11 @@ export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
       if (!isCurrent) {
         return styles.gridItem;
       }
-      return [styles.gridItem, styles.current, styles['dir-' + direction]].join(' ');
+      const gridStyles = [styles.gridItem, styles.current];
+      if (direction) {
+        gridStyles.push(styles['dir-' + direction]);
+      }
+      return gridStyles.join(' ');
     }
     const newRows: React.JSX.Element[] = [];
     for (let y = 0; y < grid.height; y++) {
@@ -56,7 +59,7 @@ export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
       }
     }
     setRows(newRows);
-  }, [position, grid.height, grid.width]);
+  }, [position, direction, grid.height, grid.width]);
 
   return (
     <>

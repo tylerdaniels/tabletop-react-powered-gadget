@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LoggingEvent, MoveEvent, StatusEvent, TabletopGrid } from '../services';
-import { Subscription } from 'rxjs';
 import { useTranslation } from 'react-i18next';
 
 import styles from './tabletop-status.module.scss';
@@ -33,7 +32,6 @@ function timeoutForEventType(
 
 export function TabletopStatus({ grid, infoTimeout, warnTimeout, errorTimeout }: TabletopStatusProperties) {
   const { t, i18n } = useTranslation();
-  const subscription = useRef(Subscription.EMPTY);
   const [positionStatus, setPositionStatus] = useState<MoveEvent | undefined>();
   const [otherStatus, setOtherStatus] = useState<LoggingEvent | undefined>();
   const [displayStyle, setDisplayStyle] = useState('');
@@ -47,7 +45,6 @@ export function TabletopStatus({ grid, infoTimeout, warnTimeout, errorTimeout }:
         setOtherStatus(event);
       }
     });
-    subscription.current = sub;
     return () => {
       sub.unsubscribe();
     };
@@ -79,14 +76,14 @@ export function TabletopStatus({ grid, infoTimeout, warnTimeout, errorTimeout }:
       const message = t('status-movement-update', { x: positionStatus.to.x, y: positionStatus.to.y });
       setDisplayStatus(message);
     } else {
-      setDisplayStyle('');
-      setDisplayStatus('');
+      setDisplayStyle(styles['type-info']);
+      setDisplayStatus(t('status-not-ready'));
     }
-  }, [i18n.language, positionStatus, otherStatus]);
+  }, [t, i18n.language, positionStatus, otherStatus]);
   return (
     <>
       <div className={displayStyle}>
-        <strong className={styles.label}>{t('status')}</strong>
+        <strong className={styles.label}>{t('status')}:</strong>
         <span>{displayStatus}</span>
       </div>
     </>

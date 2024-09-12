@@ -1,7 +1,8 @@
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import sinon from 'sinon';
 import { TabletopControls } from './tabletop-controls.component';
-import { GridPosition, TabletopGrid } from '../services';
+import { Direction, GridPosition, TabletopGrid } from '../services';
 
 const BUTTON_EVENTS: [RegExp, string][] = [
   [/up/i, 'up'],
@@ -23,7 +24,34 @@ const KEYBOARD_EVENTS: string[][] = [
   ['{Right}', 'right'],
 ];
 
+const sandbox = sinon.createSandbox();
+
+function newTabletopMockMove(): [TabletopGrid, () => Direction | undefined] {
+  const grid = new TabletopGrid({ initialPosition: { x: 2, y: 2 } });
+  const spyMove = sandbox.spy(grid, 'move');
+  return [grid, () => (spyMove.called ? spyMove.lastCall.args[0] : undefined)];
+}
+
+function newTabletopMockSetPosition(): [TabletopGrid, () => GridPosition | undefined] {
+  const grid = new TabletopGrid({ initialPosition: { x: 2, y: 2 } });
+  const spySetPosition = sandbox.spy(grid, 'setPosition');
+  function extractPosition(newPositionOrX: GridPosition | number, y?: number) {
+    if (typeof newPositionOrX === 'number') {
+      if (typeof y === 'undefined') {
+        throw new Error('"setPosition" called with only one coordinate, please use X and Y coordinates');
+      }
+      return { x: newPositionOrX, y };
+    }
+    return newPositionOrX;
+  }
+  return [grid, () => (spySetPosition.called ? extractPosition(...spySetPosition.lastCall.args) : undefined)];
+}
+
 describe('Tabletop Controls', () => {
+  afterEach(() => {
+    // Restore mocks after each test
+    sandbox.restore();
+  });
   it('should render the controls', () => {
     render(<TabletopControls grid={new TabletopGrid()} />);
     const buttons = screen.getAllByRole('button');
@@ -33,71 +61,39 @@ describe('Tabletop Controls', () => {
   BUTTON_EVENTS.forEach((event) => {
     it(`should move "${event[1]}" when "${event[1]}" button is clicked`, async () => {
       const user = userEvent.setup();
-      let movedDirection: string | undefined = undefined;
-      const grid: Pick<TabletopGrid, 'move'> = {
-        move: (direction: string) => {
-          movedDirection = direction;
-          return { x: 0, y: 0 };
-        },
-      };
-      render(<TabletopControls grid={grid as TabletopGrid} />);
+      const [grid, lastDir] = newTabletopMockMove();
+      render(<TabletopControls grid={grid} />);
       await user.click(screen.getByText(event[0]));
-      expect(movedDirection, 'no direction was moved').toBeDefined();
-      expect(movedDirection, 'movement direction was incorrect').toBe(event[1]);
+      expect(lastDir()).toBe(event[1]);
     });
   });
   KEYBOARD_EVENTS.forEach((event) => {
     it(`should move "${event[1]}" when "${event[0]}" is typed`, async () => {
       const user = userEvent.setup();
-      let movedDirection: string | undefined = undefined;
-      const grid: Pick<TabletopGrid, 'move'> = {
-        move: (direction: string) => {
-          movedDirection = direction;
-          return { x: 0, y: 0 };
-        },
-      };
-      render(<TabletopControls grid={grid as TabletopGrid} keyboardEnabled />);
+      const [grid, lastDir] = newTabletopMockMove();
+      render(<TabletopControls grid={grid} keyboardEnabled />);
       await user.keyboard(event[0]);
-      expect(movedDirection, 'no direction was moved').toBeDefined();
-      expect(movedDirection, 'movement direction was incorrect').toBe(event[1]);
+      expect(lastDir()).toBe(event[1]);
     });
     it(`should not move "${event[1]}" when "${event[0]}" is typed without keyboard enabled`, async () => {
       const user = userEvent.setup();
-      let movedDirection: string | undefined = undefined;
-      const grid: Pick<TabletopGrid, 'move'> = {
-        move: (direction: string) => {
-          movedDirection = direction;
-          return { x: 0, y: 0 };
-        },
-      };
-      render(<TabletopControls grid={grid as TabletopGrid} />);
+      const [grid, lastDir] = newTabletopMockMove();
+      render(<TabletopControls grid={grid} />);
       await user.keyboard(event[0]);
-      expect(movedDirection, 'move direction was received').toBeUndefined();
+      expect(lastDir()).toBeUndefined();
     });
   });
   it(`should set robot position on explicit update`, async () => {
     const user = userEvent.setup();
-    let movedX: number | undefined = undefined;
-    let movedY: number | undefined = undefined;
-    const grid: Pick<TabletopGrid, 'setPosition'> = {
-      setPosition: (x: number | GridPosition, y?: number) => {
-        if (typeof x === 'number') {
-          movedX = x;
-          movedY = y;
-        } else {
-          movedX = x.x;
-          movedY = x.y;
-        }
-        return true;
-      },
-    };
-    render(<TabletopControls grid={grid as TabletopGrid} />);
+    const [grid, lastPosition] = newTabletopMockSetPosition();
+    render(<TabletopControls grid={grid} />);
     await user.click(screen.getByLabelText('coord-x'));
     await user.keyboard('2');
     await user.click(screen.getByLabelText('coord-y'));
     await user.keyboard('4');
     await user.click(screen.getByText('coord-set'));
-    expect(movedX, 'no x coordinate was set').toBe(2);
-    expect(movedY, 'no y coordinate was set').toBe(4);
+    const pos = lastPosition();
+    expect(pos?.x, 'no x coordinate was set').toBe(2);
+    expect(pos?.y, 'no y coordinate was set').toBe(4);
   });
 });
