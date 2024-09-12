@@ -5,10 +5,15 @@
   "dir-down": "Down",
   "dir-left": "Left",
   "dir-right": "Right",
+  "coord-x": "X:",
+  "coord-y": "Y:",
+  "coord-set": "Set Position",
 
   "theme-select-light": "Switch to Light Theme",
   "theme-select-dark": "Switch to Dark Theme",
 
   "lang-select-en": "Switch to English",
-  "lang-select-zh": "Switch to Chinese (Simplified)"
+  "lang-select-zh": "Switch to Chinese (Simplified)",
+
+  "status": "Status:"
 }

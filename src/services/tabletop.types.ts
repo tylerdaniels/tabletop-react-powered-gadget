@@ -14,3 +14,11 @@ export interface MoveEvent {
   to: GridPosition;
   from: GridPosition;
 }
+
+/**
+ * Status event indicating a change has occurred
+ */
+export interface StatusEvent {
+  type: 'position' | 'info' | 'warn' | 'error';
+  message: string;
+}

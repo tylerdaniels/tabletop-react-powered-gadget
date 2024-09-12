@@ -79,4 +79,26 @@ describe('TabletopGrid', () => {
     const expectedPosition = { x: 3, y: 2 };
     expect(grid.robotPosition, 'updated position incorrect').toEqual(expectedPosition);
   });
+  it('should not set robot position outside grid', () => {
+    const width = 5;
+    const height = 5;
+    const initialPosition = { x: 2, y: 2 };
+    const grid = new TabletopGrid({ width, height, initialPosition });
+    expect(grid.robotPosition, 'Incorrect initial position').toEqual(initialPosition);
+    const newPosition = { x: 10, y: 10 };
+    const updated = grid.setPosition(newPosition);
+    expect(updated, 'position should not have been upgraderd').toBeFalsy();
+    expect(grid.robotPosition, 'robot was moved').toEqual(initialPosition);
+  });
+  it('should set robot position inside grid', () => {
+    const width = 5;
+    const height = 5;
+    const initialPosition = { x: 2, y: 2 };
+    const grid = new TabletopGrid({ width, height, initialPosition });
+    expect(grid.robotPosition, 'Incorrect initial position').toEqual(initialPosition);
+    const newPosition = { x: 4, y: 4 };
+    const updated = grid.setPosition(newPosition);
+    expect(updated, 'position should have been upgraderd').toBeTruthy();
+    expect(grid.robotPosition, 'robot was not moved').toEqual(newPosition);
+  });
 });

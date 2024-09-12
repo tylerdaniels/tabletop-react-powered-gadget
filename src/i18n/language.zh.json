@@ -5,10 +5,15 @@
   "dir-down": "向下",
   "dir-left": "向左",
   "dir-right": "向右",
+  "coord-x": "X坐标:",
+  "coord-y": "Y坐标:",
+  "coord-set": "设置位置",
 
   "theme-select-light": "切换到亮色主题",
   "theme-select-dark": "切换到深色主题",
 
   "lang-select-en": "切换到英文",
-  "lang-select-zh": "切换到中文(简体)"
+  "lang-select-zh": "切换到中文(简体)",
+
+  "status": "状态:"
 }

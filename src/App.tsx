@@ -12,9 +12,6 @@ import robotLogo from './assets/robot.png';
 function App() {
   const [theme, setTheme] = useState<Theme>('light');
   useEffect(() => {
-    if (!document.body) {
-      return;
-    }
     const currentTheme = theme;
     document.body.classList.add(currentTheme);
     return () => {

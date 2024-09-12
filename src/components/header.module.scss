@@ -3,12 +3,12 @@
 .header {
   width: 100%;
 
-  background-color: #DBF9F9;
-  border-bottom: 1px solid #CEF2EE;
+  background-color: #dbf9f9;
+  border-bottom: 1px solid #cef2ee;
 
   :global(body.dark) & {
-    background-color: #292D3F;
-    border-bottom: 1px solid #373F38;
+    background-color: #292d3f;
+    border-bottom: 1px solid #373f38;
   }
 }
 
@@ -21,11 +21,11 @@
   @include md {
     text-align: center;
     font-size: 2em;
-
-  };
+  }
 }
 
-.theme-selector, .lang-selector {
+.theme-selector,
+.lang-selector {
   margin: 0.5em 0.5em;
   padding: 0.5em;
   font-size: 0.8em;
@@ -34,13 +34,13 @@
 
   @include md {
     font-size: 1em;
-  };
+  }
 }
 
 .lang-selector img {
-  height: 1.0em;
+  height: 1em;
 
   @include md {
     font-size: 1.2em;
-  };
+  }
 }
