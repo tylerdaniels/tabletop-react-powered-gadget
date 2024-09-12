@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import { GridPosition, TabletopGrid } from '../services';
 import { Subscription } from 'rxjs';
+
+import styles from './tabletop-surface.module.scss';
 
 function isCurrentPosition(pos: GridPosition, x: number, y: number): boolean {
   return pos.x === x && pos.y === y;
@@ -13,13 +15,18 @@ export interface TabletopSurfaceProperties {
 export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
   const subscription = useRef(Subscription.EMPTY);
   const [position, setPosition] = useState(grid.robotPosition);
+  const [gridStyles, setGridStyles] = useState({} as CSSProperties);
   const [rows, setRows] = useState([] as React.JSX.Element[]);
-  // Update "position" state object when the robot moves
+  // Update "position" and "styles" state objects when the grid changes
   useEffect(() => {
     const sub = grid.onMove.subscribe((event) => {
       setPosition(event.to);
     });
     subscription.current = sub;
+    const styles = {} as CSSProperties;
+    styles.gridTemplateColumns = `repeat(${grid.width.toString()}, 1fr)`;
+    styles.gridTemplateRows = `repeat(${grid.height.toString()}, 1fr)`;
+    setGridStyles(styles);
     return () => {
       sub.unsubscribe();
     };
@@ -28,28 +35,26 @@ export function TabletopSurface({ grid }: TabletopSurfaceProperties) {
   useEffect(() => {
     const newRows: React.JSX.Element[] = [];
     for (let y = 0; y < grid.height; y++) {
-      const row: React.JSX.Element[] = [];
       for (let x = 0; x < grid.width; x++) {
-        if (isCurrentPosition(position, x, y)) {
-          row.push(
-            <td>
-              <strong>X</strong>
-            </td>
-          );
-        } else {
-          row.push(<td>-</td>);
-        }
+        const key = x.toString() + ',' + y.toString();
+        const gridStyles = isCurrentPosition(position, x, y) ? styles.gridItem + ' ' + styles.current : styles.gridItem;
+        newRows.push(
+          <div key={key} className={gridStyles}>
+            &nbsp;
+          </div>
+        );
       }
-      newRows.push(<tr>{...row}</tr>);
     }
     setRows(newRows);
   }, [position, grid.height, grid.width]);
 
   return (
     <>
-      <table>
-        <tbody>{...rows}</tbody>
-      </table>
+      <div className={styles.surface}>
+        <div className={styles.grid} style={gridStyles}>
+          {...rows}
+        </div>
+      </div>
     </>
   );
 }

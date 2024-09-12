@@ -15,6 +15,7 @@
   max-width: 200px;
   float: left;
   opacity: 20%;
+  z-index: -1;
 
   @include md {
     // Show normally with more screen space

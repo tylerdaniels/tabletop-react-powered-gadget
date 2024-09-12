@@ -1,0 +1,38 @@
+@import '../styles/variables';
+
+.surface {
+  // Background Image settings
+  background: url('../assets/pool-table.png') center no-repeat;
+  background-size: contain;
+
+  padding: 2vw;
+  max-width: 600px;
+  max-height: 600px;
+}
+
+.grid {
+  display: grid;
+  margin: 0 auto;
+  gap: 0.2em;
+  column-gap: 0.2em;
+  width: 80vw;
+  height: 80vw;
+  max-width: 500px;
+  max-height: 500px;
+
+  @include sm {
+    width: 60vw;
+    height: 60vw;
+  }
+
+  @include md {
+    width: 40vw;
+    height: 40vw;
+  }
+}
+
+.gridItem {
+  &.current {
+    background-color: #F00;
+  }
+}

@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TabletopGrid } from '../services';
+import { Direction, TabletopGrid } from '../services';
+
+import styles from './tabletop-controls.module.scss';
 
 export interface TabletopControlsProperties {
   grid: TabletopGrid;
   keyboardEnabled?: boolean;
+  preferArrows?: boolean;
+  gamerMode?: boolean;
 }
 
-export function TabletopControls({ grid, keyboardEnabled }: TabletopControlsProperties) {
+export function TabletopControls({ grid, keyboardEnabled, preferArrows, gamerMode }: TabletopControlsProperties) {
   const { t } = useTranslation();
   useEffect(() => {
     if (!keyboardEnabled) {
@@ -15,23 +19,28 @@ export function TabletopControls({ grid, keyboardEnabled }: TabletopControlsProp
       return;
     }
     const keyboardListener = (event: KeyboardEvent) => {
+      let direction: Direction | undefined = undefined;
       switch (event.key) {
         case 'Up': // Edge (16 and earlier) and Firefox (36 and earlier)
         case 'ArrowUp':
-          grid.move('up');
+          direction = 'up';
           break;
         case 'Down': // Edge (16 and earlier) and Firefox (36 and earlier)
         case 'ArrowDown':
-          grid.move('down');
+          direction = 'down';
           break;
         case 'Left': // Edge (16 and earlier) and Firefox (36 and earlier)
         case 'ArrowLeft':
-          grid.move('left');
+          direction = 'left';
           break;
         case 'Right': // Edge (16 and earlier) and Firefox (36 and earlier)
         case 'ArrowRight':
-          grid.move('right');
+          direction = 'right';
           break;
+      }
+      if (direction) {
+        grid.move(direction);
+        event.stopPropagation(); // Don't scroll the screen
       }
     };
     window.addEventListener('keydown', keyboardListener);
@@ -43,13 +52,21 @@ export function TabletopControls({ grid, keyboardEnabled }: TabletopControlsProp
   const [yPos, setYPos] = useState(0);
   return (
     <>
-      <div>
-        <button onClick={() => grid.move('up')}>{t('dir-up')}</button>
-        <button onClick={() => grid.move('down')}>{t('dir-down')}</button>
-        <button onClick={() => grid.move('left')}>{t('dir-left')}</button>
-        <button onClick={() => grid.move('right')}>{t('dir-right')}</button>
+      <div className={styles.directionBtns + (gamerMode ? ' ' + styles.gamerMode : '')}>
+        <button className={styles.dirUp} onClick={() => grid.move('up')}>
+          {preferArrows ? <i className="fa-solid fa-arrow-up" aria-label={t('dir-up')}></i> : t('dir-up')}
+        </button>
+        <button className={styles.dirLeft} onClick={() => grid.move('left')}>
+          {preferArrows ? <i className="fa-solid fa-arrow-left" aria-label={t('dir-left')}></i> : t('dir-left')}
+        </button>
+        <button className={styles.dirRight} onClick={() => grid.move('right')}>
+          {preferArrows ? <i className="fa-solid fa-arrow-right" aria-label={t('dir-right')}></i> : t('dir-right')}
+        </button>
+        <button className={styles.dirDown} onClick={() => grid.move('down')}>
+          {preferArrows ? <i className="fa-solid fa-arrow-down" aria-label={t('dir-down')}></i> : t('dir-down')}
+        </button>
       </div>
-      <div>
+      <div className={styles.explicitPos}>
         <label htmlFor="x-pos">{t('coord-x')}</label>
         <input
           id="x-pos"

@@ -43,7 +43,7 @@ body.light a:hover {
   color: #747bff;
 }
 body.light button {
-  background-color: #f9f9f9;
+  background-color: #efefef;
 }
 
 body.dark {
@@ -63,5 +63,5 @@ body.dark a:hover {
 
 body.dark button {
   color: rgba(255, 255, 255, 0.87);
-  background-color: #1a1a1a;
+  background-color: #333333;
 }

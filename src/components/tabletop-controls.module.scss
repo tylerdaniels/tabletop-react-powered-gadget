@@ -1,0 +1,88 @@
+@import '../styles/variables';
+
+.directionBtns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  button {
+    margin: 10px;
+  }
+  // Horizontal Positioning
+  .dirUp,.dirDown {
+    grid-column-start: 2;
+    grid-column-end: 4;
+  }
+  .dirLeft {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+  .dirRight {
+    grid-column-start: 3;
+    grid-column-end: 5;
+  }
+  // Vertical Positioning
+  .dirUp {
+    grid-row-start: 1;
+    grid-row-end: 2;
+  }
+  .dirLeft,.dirRight {
+    grid-row-start: 2;
+    grid-row-end: 3;
+  }
+  .dirDown {
+    grid-row-start: 3;
+    grid-row-end: 4;
+  }
+
+  &.gamerMode {
+    // Switch to WASD layout
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+
+    // Horizontal Positioning
+    .dirUp,.dirDown {
+      grid-column-start: 2;
+      grid-column-end: 3;
+    }
+    .dirLeft {
+      grid-column-start: 1;
+      grid-column-end: 2;
+    }
+    .dirRight {
+      grid-column-start: 3;
+      grid-column-end: 4;
+    }
+    // Vertical Positioning
+    .dirUp {
+      grid-row-start: 1;
+      grid-row-end: 2;
+    }
+    .dirLeft, .dirDown, .dirRight {
+      grid-row-start: 2;
+      grid-row-end: 3;
+    }
+  }
+}
+
+.explicitPos {
+  input {
+    margin: 0 10px 0 2px;
+    width: 40px;
+    @include sm {
+      width: 50px;
+    }
+  
+    @include md {
+      width: 70px;
+    }
+  }
+
+}
+
+.gridItem {
+  border: solid 1px #000;
+
+  &.current {
+    background-color: #F00;
+  }
+}
